@@ -15,7 +15,7 @@ const App = () => {
     const [places, setPlaces] = useState([]);
 
     const [coordinates, setCoordinates] = useState({}); // Coordenadas del centro del mapa
-    const [bounds, setBounds] = useState(null);         // Límites del mapa para filtrar los lugares
+    const [bounds, setBounds] = useState({});         // Límites del mapa para filtrar los lugares
 
     useEffect(() => {
         // Obtener la ubicación actual del usuario al cargar la aplicación
@@ -25,13 +25,16 @@ const App = () => {
     }, []);
 
     useEffect(() => {
-        console.log(coordinates, bounds); // Verificar que las coordenadas y los límites se actualizan correctamente
-        
-        getPlacesData()
-            .then((data) => {
-                console.log(data);
-                setPlaces(data);
-            })
+        // ESCUDO: Solo ejecutamos la búsqueda si bounds existe y tiene las esquinas
+        if (bounds && bounds.sw && bounds.ne) {
+            console.log(coordinates, bounds); 
+            
+            getPlacesData(bounds.sw, bounds.ne)
+                .then((data) => {
+                    console.log(data);
+                    setPlaces(data);
+                })
+        }
     }, [coordinates, bounds]);
 
     return (
@@ -40,7 +43,7 @@ const App = () => {
             <Header />
             <Box sx={{ display: "flex", height: "calc(100vh - 64px)" }}>
                 <Box sx={{ flex: "0 0 33.333%", overflow: "auto", borderRight: "1px solid #e0e0e0" }}>
-                    <List />
+                    <List places={places} /> 
                 </Box>
                 <Box sx={{ flex: "1", overflow: "hidden" }}>
                     <Map 

@@ -2,22 +2,9 @@ import React, { useState } from "react";
 import { CircularProgress, Typography, InputLabel, MenuItem, FormControl, Select, Box, Grid } from "@mui/material";
 import PlaceDetails from "../PlaceDetails/PlaceDetails";
 
-const List = () => {
+const List = ({ places }) => {
     const [type, setType] = useState('restaurants');
     const [rating, setRating] = useState('');
-
-    // Datos de marcado actualizados para que coincidan con image_1.png
-    const places = [
-        { name: "Cool Place", rating: 4.5, type: "restaurants" },
-        { name: "Best Beer", rating: 4.0, type: "hotels" },
-        { name: "Best Steak", rating: 3.5, type: "attractions" },
-        { name: "Cool Place", rating: 4.5, type: "restaurants" },
-        { name: "Best Beer", rating: 4.0, type: "hotels" },
-        { name: "Best Steak", rating: 3.5, type: "attractions" },
-        { name: "Cool Place", rating: 4.5, type: "restaurants" },
-        { name: "Best Beer", rating: 4.0, type: "hotels" },
-        { name: "Best Steak", rating: 3.5, type: "attractions" },
-    ]
 
     return (
         <Box sx={{ padding: '25px' }}>
