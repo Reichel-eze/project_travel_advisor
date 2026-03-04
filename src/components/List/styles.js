@@ -1,11 +1,12 @@
 import { makeStyles } from "@mui/styles";
 
-export default makeStyles((theme) => ({
+// Le quitamos el (theme) de los parámetros y pasamos los valores a píxeles
+export default makeStyles(() => ({
   formControl: {
-    margin: theme.spacing(1), minWidth: 120, marginBottom: '30px', width: '100%',
+    margin: '8px', minWidth: 120, marginBottom: '30px', width: '100%',
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: '16px',
   },
   loading: {
     height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center',

@@ -1,16 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, createRef } from "react";
 import { CircularProgress, Typography, InputLabel, MenuItem, FormControl, Select, Box, Grid } from "@mui/material";
 import PlaceDetails from "../PlaceDetails/PlaceDetails";
 
-const List = ({ places }) => {
+import useStyles from './styles.js';
+
+const List = ({ places, childClicked, isLoading }) => {
+    const classes = useStyles();
     const [type, setType] = useState('restaurants');
     const [rating, setRating] = useState('');
+    const [elRefs, setElRefs] = useState([]);
+
+    useEffect(() => {
+        // 1. Agregamos "|| 0" como escudo de seguridad por si places está vacío
+        const refs = Array(places?.length || 0).fill().map((_, i) => elRefs[i] || createRef());
+        setElRefs(refs);
+    }, [places]);
 
     return (
         <Box sx={{ padding: '25px' }}>
             {/* 1. Título - Primero y secuencial */}
             <Typography variant="h4" sx={{ marginBottom: '20px' }}>Restaurants, Hotels & Attractions around you</Typography>
             
+            {isLoading ? (
+                <div className={classes.loading}>
+                    <CircularProgress size="5rem" />
+                </div>
+            ) : (
+                <>
             {/* 2. Contenedor de Filtros - SEPARADO y justo debajo del título */}
             <Box sx={{ display: 'flex', gap: '15px', marginBottom: 2, alignItems: 'center' }}>
                 
@@ -41,11 +57,16 @@ const List = ({ places }) => {
             <Grid container spacing={3} direction="column" wrap="nowrap" sx={{ height: '75vh', overflow: 'auto' }}>
                 {places?.map((place, i) => (
                     <Grid item key={i}> 
-                        <PlaceDetails place={place} />
+                        <PlaceDetails 
+                            place={place}
+                            selected={Number(childClicked) === i}
+                            refProp={elRefs[i]}
+                        />
                     </Grid>
                 ))}
             </Grid>
-
+            </>
+            )}
         </Box>
     );
 }

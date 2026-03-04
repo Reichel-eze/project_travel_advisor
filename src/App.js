@@ -13,9 +13,12 @@ const theme = createTheme();
 const App = () => {
 
     const [places, setPlaces] = useState([]);
+    const [childClicked, setChildClicked] = useState(null); // Para saber qué lugar se ha clickeado en el mapa
 
     const [coordinates, setCoordinates] = useState({}); // Coordenadas del centro del mapa
     const [bounds, setBounds] = useState({});         // Límites del mapa para filtrar los lugares
+
+    const [isLoading, setIsLoading] = useState(false);   // Para mostrar un spinner mientras cargan los datos
 
     useEffect(() => {
         // Obtener la ubicación actual del usuario al cargar la aplicación
@@ -29,10 +32,12 @@ const App = () => {
         if (bounds && bounds.sw && bounds.ne) {
             console.log(coordinates, bounds); 
             
+            setIsLoading(true); // Empezamos a cargar los datos
             getPlacesData(bounds.sw, bounds.ne)
                 .then((data) => {
                     console.log(data);
                     setPlaces(data);
+                    setIsLoading(false); // Terminamos de cargar los datos
                 })
         }
     }, [coordinates, bounds]);
@@ -43,13 +48,19 @@ const App = () => {
             <Header />
             <Box sx={{ display: "flex", height: "calc(100vh - 64px)" }}>
                 <Box sx={{ flex: "0 0 33.333%", overflow: "auto", borderRight: "1px solid #e0e0e0" }}>
-                    <List places={places} /> 
+                    <List 
+                        places={places} 
+                        childClicked={childClicked}
+                        isLoading={isLoading}
+                    /> 
                 </Box>
                 <Box sx={{ flex: "1", overflow: "hidden" }}>
                     <Map 
                         setCoordinates={setCoordinates}
                         setBounds={setBounds}
                         coordinates={coordinates}
+                        places={places}
+                        setChildClicked={setChildClicked}
                     />
                 </Box>
             </Box>
