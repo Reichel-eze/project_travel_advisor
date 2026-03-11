@@ -1,6 +1,8 @@
 import { wait } from '@testing-library/user-event/dist/utils';
 import axios from 'axios'; // libreria que nos permite hacer peticiones http
 
+// hola, probando si puedo hacer commmit
+
 export const getPlacesData = async (type, sw, ne) => {
     try {
         const { data: { data } } = await axios.get(`https://travel-advisor.p.rapidapi.com/${type}/list-in-boundary`, {
