@@ -1,6 +1,6 @@
-import React from "react";
-// 1. Importamos useMapEvents
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import React, { useEffect, useRef } from "react";
+// 1. Importamos useMapEvents y useMap
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { LocationOnOutlined } from "@mui/icons-material";
@@ -17,7 +17,41 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
-// 2. Creamos este nuevo componente que "escucha" al mapa
+// 2. Creamos este nuevo componente que actualiza el centro del mapa solo con cambios significativos
+const MapUpdater = ({ coordinates }) => {
+    const map = useMap();
+    const prevCoordinates = useRef(null);
+
+    useEffect(() => {
+        if (coordinates && coordinates.lat && coordinates.lng) {
+            // Calcular la distancia desde la posición anterior
+            let shouldUpdate = false;
+            
+            if (!prevCoordinates.current) {
+                shouldUpdate = true; // Primera vez
+            } else {
+                // Calcular distancia aproximada (en grados, diferencia > 0.1 es significativa)
+                const latDiff = Math.abs(coordinates.lat - prevCoordinates.current.lat);
+                const lngDiff = Math.abs(coordinates.lng - prevCoordinates.current.lng);
+                
+                // Solo actualizar si la distancia es mayor a 0.1 grados (~11km)
+                shouldUpdate = latDiff > 0.1 || lngDiff > 0.1;
+            }
+            
+            if (shouldUpdate) {
+                prevCoordinates.current = coordinates;
+                // flyTo anima el movimiento hacia las nuevas coordenadas
+                map.flyTo([coordinates.lat, coordinates.lng], 13, {
+                    duration: 2 // segundos
+                });
+            }
+        }
+    }, [coordinates, map]);
+
+    return null; // No renderiza nada visual
+};
+
+// 3. Creamos este nuevo componente que "escucha" al mapa
 const MapEvents = ({ setCoordinates, setBounds }) => {
     useMapEvents({
         moveend: (e) => {
@@ -64,7 +98,10 @@ const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             
-            {/* 3. Insertamos nuestro detector de eventos dentro del MapContainer */}
+            {/* 4. Insertamos nuestro actualizador de coordenadas dentro del MapContainer */}
+            <MapUpdater coordinates={coordinates} />
+            
+            {/* 5. Insertamos nuestro detector de eventos dentro del MapContainer */}
             <MapEvents setCoordinates={setCoordinates} setBounds={setBounds} />
 
             <Marker position={coordinates}>

@@ -17,6 +17,7 @@ const App = () => {
     const [childClicked, setChildClicked] = useState(null); // Para saber qué lugar se ha clickeado en el mapa
 
     const [coordinates, setCoordinates] = useState({}); // Coordenadas del centro del mapa
+    const [searchedLocation, setSearchedLocation] = useState(null); // Nueva ubicación buscada desde el Header
     const [bounds, setBounds] = useState({});         // Límites del mapa para filtrar los lugares
 
     const [isLoading, setIsLoading] = useState(false);   // Para mostrar un spinner mientras cargan los datos
@@ -32,6 +33,14 @@ const App = () => {
             setCoordinates({ lat: latitude, lng: longitude });
         });
     }, []);
+
+    // Este useEffect se ejecutará cuando se busca una ubicación desde el Header
+    useEffect(() => {
+        if (searchedLocation && searchedLocation.lat && searchedLocation.lng) {
+            setCoordinates(searchedLocation); // Actualiza solo las coordenadas
+            // Los bounds se actualizarán automáticamente cuando el mapa se mueva (MapEvents)
+        }
+    }, [searchedLocation]);
 
     // Este useEffect se ejecutará cada vez que cambie el rating O los lugares
     useEffect(() => {
@@ -54,17 +63,21 @@ const App = () => {
             getPlacesData(type, bounds.sw, bounds.ne)
                 .then((data) => {
                     console.log(data);
-                    setPlaces(data);
+                    setPlaces(data?.filter((place) => place.name && place.num_reviews > 0)); // Solo lugares con nombre y reseñas
                     setFilteredPlaces([]); // Limpiamos los lugares filtrados al cargar nuevos datos
                     setIsLoading(false); // Terminamos de cargar los datos
                 })
+                .catch((error) => {
+                    console.error("Error fetching places:", error);
+                    setIsLoading(false);
+                });
         }
-    }, [type, coordinates, bounds]);
+    }, [type, bounds]);
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Header />
+            <Header setSearchedLocation={setSearchedLocation} />
             <Box sx={{ display: "flex", height: "calc(100vh - 64px)" }}>
                 <Box sx={{ flex: "0 0 33.333%", overflow: "auto", borderRight: "1px solid #e0e0e0" }}>
                     <List 
