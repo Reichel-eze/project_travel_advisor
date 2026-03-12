@@ -51,7 +51,50 @@ const MapUpdater = ({ coordinates }) => {
     return null; // No renderiza nada visual
 };
 
-// 3. Creamos este nuevo componente que "escucha" al mapa
+// 4. Creamos un componente para mostrar el clima como widget flotante
+const WeatherWidget = ({ weatherData }) => {
+    const map = useMap();
+
+    // Crea un control personalizado en la esquina superior derecha
+    useEffect(() => {
+        if (!weatherData || !weatherData.weather) return;
+
+        // Crear un elemento HTML personalizado para el widget
+        const weatherControl = L.control({ position: 'topright' });
+
+        weatherControl.onAdd = (map) => {
+            const div = L.DomUtil.create('div', 'weather-widget');
+            div.style.backgroundColor = 'white';
+            div.style.padding = '12px';
+            div.style.borderRadius = '8px';
+            div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            div.style.textAlign = 'center';
+            div.style.fontFamily = 'Arial, sans-serif';
+            div.style.minWidth = '120px';
+
+            div.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 4px; font-size: 18px;">${Math.round(weatherData.main.temp)}°C</div>
+                <div style="font-size: 12px; color: #666; margin-bottom: 8px; text-transform: capitalize;">
+                    ${weatherData.weather[0].description}
+                </div>
+                <img src="https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png" alt="weather" style="width: 80px; height: 80px;" />
+            `;
+
+            // Prevenir que los clicks en el widget afecten al mapa
+            L.DomEvent.disableClickPropagation(div);
+
+            return div;
+        };
+
+        weatherControl.addTo(map);
+
+        return () => {
+            weatherControl.remove();
+        };
+    }, [weatherData, map]);
+
+    return null;
+};
 const MapEvents = ({ setCoordinates, setBounds }) => {
     useMapEvents({
         moveend: (e) => {
@@ -72,7 +115,7 @@ const MapEvents = ({ setCoordinates, setBounds }) => {
     return null; // No renderiza nada visual, solo trabaja en segundo plano
 };
 
-const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }) => {
+const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked, weatherData }) => {
     const zoom = 13;
     const isDesktop = useMediaQuery('(min-width:600px)');
     const classes = useStyles();
@@ -103,10 +146,15 @@ const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }
             
             {/* 5. Insertamos nuestro detector de eventos dentro del MapContainer */}
             <MapEvents setCoordinates={setCoordinates} setBounds={setBounds} />
+            
+            {/* 6. Insertamos el widget del clima */}
+            <WeatherWidget weatherData={weatherData} />
 
             <Marker position={coordinates}>
                 <Popup>
-                    Ubicación actual
+                    <Typography variant="subtitle2">
+                        Tu ubicación
+                    </Typography>
                 </Popup>
             </Marker>
 

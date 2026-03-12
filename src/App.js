@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CssBaseline, Grid, ThemeProvider, createTheme, Box } from "@mui/material";
 
-import { getPlacesData } from "./api";
+import { getPlacesData, getWeatherData } from "./api";
 
 import Header from "./components/Header/Header";
 import List from "./components/List/List";
@@ -13,6 +13,7 @@ const theme = createTheme();
 const App = () => {
 
     const [places, setPlaces] = useState([]);
+    const [weatherData, setWeatherData] = useState([]);       // Para almacenar los datos del clima
     const [filteredPlaces, setFilteredPlaces] = useState([]); // Para almacenar los lugares filtrados por rating
     const [childClicked, setChildClicked] = useState(null); // Para saber qué lugar se ha clickeado en el mapa
 
@@ -60,6 +61,11 @@ const App = () => {
             console.log(coordinates, bounds); 
             
             setIsLoading(true); // Empezamos a cargar los datos
+
+            getWeatherData(coordinates.lat, coordinates.lng)
+                .then((data) => setWeatherData(data))
+
+
             getPlacesData(type, bounds.sw, bounds.ne)
                 .then((data) => {
                     console.log(data);
@@ -97,6 +103,7 @@ const App = () => {
                         coordinates={coordinates}
                         places={filteredPlaces.length ? filteredPlaces : places} // Si hay lugares filtrados, los mostramos; si no, mostramos todos
                         setChildClicked={setChildClicked}
+                        weatherData={weatherData} // Pasamos los datos del clima al componente Map
                     />
                 </Box>
             </Box>

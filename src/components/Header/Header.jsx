@@ -142,6 +142,11 @@ const Header = ({ setSearchedLocation }) => {
                             placeholder="Search location..."
                             value={searchInput}
                             onChange={handleInputChange}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === 'Escape') {
+                                    setShowSuggestions(false);
+                                }
+                            }}
                             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                             sx={{
                                 color: 'inherit',

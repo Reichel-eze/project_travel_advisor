@@ -23,3 +23,20 @@ export const getPlacesData = async (type, sw, ne) => {
         console.log(error);
     }
 }
+
+export const getWeatherData = async (lat, lng) => {
+    try {
+        const { data } = await axios.get(`https://api.openweathermap.org/data/2.5/weather`, {
+          params: {
+                lat: lat,
+                lon: lng,
+                appid: '1b0078fec396085028120c9457384e6f',
+                units: 'metric', // 🌡️ Magia extra: esto hace que la temperatura venga en Celsius
+          }
+        }); 
+        return data;
+    } catch (error) {
+        console.log('Error buscando clima:', error);
+        return null;
+    }
+}
