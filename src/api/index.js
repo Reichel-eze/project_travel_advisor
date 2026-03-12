@@ -13,7 +13,7 @@ export const getPlacesData = async (type, sw, ne) => {
             tr_longitude: ne.lng,
           },
           headers: {
-            'x-rapidapi-key': 'efebdf920dmsh5852510317600f6p153f2ajsnae004f5e3bf3',
+            'x-rapidapi-key': process.env.REACT_APP_RAPIDAPI_TRAVEL_API_KEY,
             'x-rapidapi-host': 'travel-advisor.p.rapidapi.com'
           }
         });
@@ -30,7 +30,7 @@ export const getWeatherData = async (lat, lng) => {
           params: {
                 lat: lat,
                 lon: lng,
-                appid: '1b0078fec396085028120c9457384e6f',
+                appid: process.env.REACT_APP_OPENWEATHERMAP_API_KEY,
                 units: 'metric', // 🌡️ Magia extra: esto hace que la temperatura venga en Celsius
           }
         }); 
